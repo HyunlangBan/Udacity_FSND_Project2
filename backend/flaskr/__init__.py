@@ -46,7 +46,7 @@ def create_app(test_config=None):
   '''
   @app.route('/categories')
   def get_cateories():
-        selection = Category.query.order_by(Category.id).all()
+        #selection = Category.query.order_by(Category.id).all()
         categories = {
               "1": "Science",
               "2": "Art",
@@ -151,14 +151,8 @@ def create_app(test_config=None):
 
   @app.route('/questions', methods=['POST'])
   def create_question():
-        body = request.get_json()
-        search = request.args.get('searchTerm', None, type=str)
         
-        new_question = body.get('question')
-        new_answer = body.get('answer')
-        new_category = body.get('category')
-        new_difficulty = body.get('difficulty')
-
+        search = request.args.get('searchTerm', None, type=str)
       
         if search:
           selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
@@ -173,6 +167,13 @@ def create_app(test_config=None):
           )
 
         else:
+          body = request.get_json()
+          
+          new_question = body.get('question')
+          new_answer = body.get('answer')
+          new_category = body.get('category')
+          new_difficulty = body.get('difficulty')
+
           new_question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
           new_question.insert()
 
@@ -257,7 +258,7 @@ def create_app(test_config=None):
       else:
         questions = Question.query.all()
 
-    max = len(questions)
+    max = len(questions)-1
 
     if max>0:
       question = questions[random.randint(0, max)].format()
