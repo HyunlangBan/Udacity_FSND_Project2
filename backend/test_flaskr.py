@@ -15,13 +15,14 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}/{}".format('postgres:gus123@localhost:5432', self.database_name)
+        self.database_path = "postgres://{}/{}".format(
+            'postgres:gus123@localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_question = {
-            'question':'What day today?',
-            'answer': 'Tue',
-            'category': 4,
+            'question': 'Is it a test?',
+            'answer': 'yes',
+            'category': 1,
             'difficulty': 1
         }
 
@@ -45,7 +46,8 @@ class TriviaTestCase(unittest.TestCase):
     @TODO: 
     Create an endpoint to handle GET requests 
     for all available categories.
-    '''   
+    '''
+
     def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
@@ -54,31 +56,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
 
-    
     def test_get_questions(self):
         res = self.client().get('/questions')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
+        self.assertEqual(data['current_category'], None)
         self.assertTrue(data['questions'])
-        self.assertTrue(data['current_questions_number'])
-        self.assertTrue(data['total_pages'])
+        self.assertTrue(data['categories'])
         self.assertTrue(data['total_questions'])
-        
 
     def test_delete_question(self):
         res = self.client().delete('/questions/2')
         data = json.loads(res.data)
 
-        question = Question.query.filter(Question.id==2).one_or_none()
+        question = Question.query.filter(Question.id == 2).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 2)
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_questions'])
-        self.assertEqual(question, None)
 
     def test_create_question(self):
         res = self.client().post('/questions', json=self.new_question)
@@ -86,13 +84,13 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['created'])
-        self.assertTrue(data['questions'])
-        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['question'])
+        self.assertTrue(data['answer'])
+        self.assertTrue(data['category'])
+        self.assertTrue(data['difficulty'])
 
-    
     def test_search_questions(self):
-        res = self.client().post('/questions', json={'search': 'title'})
+        res = self.client().post('/questions?searchTerm=title')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -102,15 +100,15 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/categories/2/questions')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code,200)
+        self.assertEqual(res.status_code, 200)
         self.assertTrue(data['current_questions'])
-        self.assertEqual(data['total_questions'],4)
+        self.assertEqual(data['total_questions'], 4)
 
     def test_post_quizzes(self):
         res = self.client().post('/quizzes', json={})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code,200)
+        self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
 
@@ -138,8 +136,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(data['success'], False)
         self.assertEqual(res.status_code, 404)
-
-        
 
 
 # Make the tests conveniently executable
