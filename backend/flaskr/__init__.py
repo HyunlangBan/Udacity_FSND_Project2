@@ -41,8 +41,8 @@ def create_app(test_config=None):
         categories = {}
 
         for c in category:
-          categories[c.id] = c.type
-            
+            categories[c.id] = c.type
+
         return jsonify(
             {
                 'success': True,
@@ -58,8 +58,8 @@ def create_app(test_config=None):
         categories = {}
 
         for c in category:
-          categories[c.id] = c.type
-        
+            categories[c.id] = c.type
+
         if len(current_questions) == 0:
             abort(404)
 
@@ -110,6 +110,9 @@ def create_app(test_config=None):
 
         else:
             body = request.get_json()
+
+            if body is None:
+              abort(422)
 
             question = body.get('question')
             answer = body.get('answer')
