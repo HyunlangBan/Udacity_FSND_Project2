@@ -1,0 +1,7 @@
+#folder
+env/
+.vscode/
+backend/.vscode/
+backend/__pycache__/
+backend/flaskr/__pycache__/
+frontend/node_modules/
